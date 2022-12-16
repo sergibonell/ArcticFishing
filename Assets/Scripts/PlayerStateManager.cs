@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class PlayerStateManager : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class PlayerStateManager : MonoBehaviour
     private Animator animator;
     private CharacterController controller;
 
+    [SerializeField]
+    private CinemachineInputProvider camInput;
     public static PlayerStateManager Instance { get; private set; }
     public bool isMovementBlocked { get; private set; }
 
@@ -26,6 +29,8 @@ public class PlayerStateManager : MonoBehaviour
     void Start()
     {
         ChangeState(States.Idle);
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
     }
 
     public void ChangeState(States state)
@@ -55,6 +60,11 @@ public class PlayerStateManager : MonoBehaviour
     public States GetCurrent()
     {
         return currentState;
+    }
+
+    public bool CompareState(States state)
+    {
+        return currentState == state;
     }
 
     void idleState()

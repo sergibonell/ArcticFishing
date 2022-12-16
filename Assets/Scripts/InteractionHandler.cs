@@ -5,12 +5,17 @@ using UnityEngine.InputSystem;
 public class InteractionHandler : MonoBehaviour
 {
     private SpringJoint joint;
+    private WaterBodyLogic water;
+
     [SerializeField]
-    private Rigidbody bobber;
+    private Rigidbody hookRb;
+    [SerializeField]
+    private GameObject bobber;
+    [SerializeField]
+    private MeshFilter fishMesh;
 
     [SerializeField]
     private Transform reelPoint;
-    private int layer;
     [SerializeField]
     private float raycastLen = 5f;
     [SerializeField]
@@ -22,10 +27,14 @@ public class InteractionHandler : MonoBehaviour
     [SerializeField]
     private float reelUpTime = 1f;
 
+    [SerializeField]
+    private string fishableLayer;
+    private int layerIndex;
+
     private void Awake()
     {
         joint = GetComponentInChildren<SpringJoint>();
-        layer = LayerMask.GetMask("Fishable");
+        layerIndex = LayerMask.GetMask(fishableLayer);
     }
 
     void OnInteract()
@@ -38,14 +47,17 @@ public class InteractionHandler : MonoBehaviour
         
         if(PlayerStateManager.Instance.GetCurrent() == States.Caught)
         {
+            bobber.SetActive(true);
+            fishMesh.mesh = null;
             PlayerStateManager.Instance.ChangeState(States.Idle);
             return;
         }
 
         Debug.DrawRay(reelPoint.position, Vector3.down * 50, Color.red, 5f);
         RaycastHit hit;
-        if (!PlayerStateManager.Instance.isMovementBlocked && Physics.Raycast(reelPoint.position, Vector3.down, out hit, raycastLen, layer))
+        if (!PlayerStateManager.Instance.isMovementBlocked && !PlayerStateManager.Instance.CompareState(States.Jumping) && Physics.Raycast(reelPoint.position, Vector3.down, out hit, raycastLen, layerIndex))
         {
+            water = hit.collider.gameObject.GetComponent<WaterBodyLogic>();
             PlayerStateManager.Instance.ChangeState(States.Fishing);
             return;
         }
@@ -55,21 +67,23 @@ public class InteractionHandler : MonoBehaviour
     void reelDown()
     {
         StartCoroutine(reelCoroutine(distanceLong, reelDownTime));
-        if (bobber != null)
-            bobber.AddForce(transform.TransformDirection(Vector3.forward) * 8f, ForceMode.Impulse);
+        if (hookRb != null)
+            hookRb.AddForce(transform.TransformDirection(Vector3.forward) * 8f, ForceMode.Impulse);
         StartCoroutine(fishingWait());
     }
 
     IEnumerator fishingWait()
     {
-        yield return new WaitForSecondsRealtime(5f);
+        yield return new WaitForSecondsRealtime(2f);
         PlayerStateManager.Instance.ChangeState(States.Caught);
+        bobber.SetActive(false);
+        fishMesh.mesh = water.AvailableFishes.GetRandomFish().Model;
         reelUp();
     }
 
     void reelUp()
     {
-        bobber.constraints = RigidbodyConstraints.None;
+        hookRb.constraints = RigidbodyConstraints.None;
         StartCoroutine(reelCoroutine(distanceShort, reelUpTime));
     }
 
@@ -84,10 +98,5 @@ public class InteractionHandler : MonoBehaviour
             joint.maxDistance = Mathf.Lerp(startLen, target, currentTime);
             yield return null;
         }
-    }
-
-    void showFish()
-    {
-
     }
 }

@@ -7,7 +7,7 @@ public class Movement3D : MonoBehaviour
     private CharacterController controller;
     private PlayerStateManager manager;
 
-    Transform camera;
+    Transform cameraTransform;
     private Vector3 velocity;
     private Vector2 moveInput;
     private Vector2 relativeMoveInput;
@@ -24,9 +24,8 @@ public class Movement3D : MonoBehaviour
 
     private void Awake()
     {
-        manager = GetComponent<PlayerStateManager>();
         controller = GetComponent<CharacterController>();
-        camera = Camera.main.transform;
+        cameraTransform = Camera.main.transform;
     }
 
     // Update is called once per frame
@@ -37,9 +36,8 @@ public class Movement3D : MonoBehaviour
 
         handleStates();
 
-        if (!manager.isMovementBlocked)
+        if (!PlayerStateManager.Instance.isMovementBlocked)
             commitMove();
-            
     }
 
     void handleMovementXZ()
@@ -89,7 +87,7 @@ public class Movement3D : MonoBehaviour
     void rawInputToRelative()
     {
         Vector3 dir = new Vector3(moveInput.x, 0, moveInput.y);
-        dir = Quaternion.Euler(0, camera.rotation.eulerAngles.y, 0) * dir;
+        dir = Quaternion.Euler(0, cameraTransform.rotation.eulerAngles.y, 0) * dir;
         relativeMoveInput = new Vector2(dir.x, dir.z);
     }
 
@@ -97,7 +95,7 @@ public class Movement3D : MonoBehaviour
     {
         if(moveInput.magnitude > 0f)
         {
-            Quaternion targetRotation = Quaternion.Euler(0, camera.eulerAngles.y, 0);
+            Quaternion targetRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }

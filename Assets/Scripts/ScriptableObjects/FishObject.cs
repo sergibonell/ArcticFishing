@@ -6,5 +6,5 @@ using UnityEngine;
 public class FishObject : ScriptableObject
 {
     public string Name;
-    public GameObject Model;
+    public Mesh Model;
 }
