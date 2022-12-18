@@ -37,8 +37,14 @@ public class InteractionHandler : MonoBehaviour
         layerIndex = LayerMask.GetMask(fishableLayer);
     }
 
-    void OnInteract()
+    private void Start()
     {
+        PlayerStateManager.Instance.Input.actions["Interact"].started += it => OnInteract(it);
+    }
+
+    public void OnInteract(InputAction.CallbackContext ctx)
+    {
+        Debug.Log(ctx.phase.ToString());
         if(reelPoint == null)
         {
             Debug.LogError("reelPoint is not assigned");
@@ -55,7 +61,7 @@ public class InteractionHandler : MonoBehaviour
 
         Debug.DrawRay(reelPoint.position, Vector3.down * 50, Color.red, 5f);
         RaycastHit hit;
-        if (!PlayerStateManager.Instance.isMovementBlocked && !PlayerStateManager.Instance.CompareState(States.Jumping) && Physics.Raycast(reelPoint.position, Vector3.down, out hit, raycastLen, layerIndex))
+        if (!PlayerStateManager.Instance.IsMovementBlocked && !PlayerStateManager.Instance.CompareState(States.Jumping) && Physics.Raycast(reelPoint.position, Vector3.down, out hit, raycastLen, layerIndex))
         {
             water = hit.collider.gameObject.GetComponent<WaterBodyLogic>();
             PlayerStateManager.Instance.ChangeState(States.Fishing);

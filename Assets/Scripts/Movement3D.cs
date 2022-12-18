@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 public class Movement3D : MonoBehaviour
 {
     private CharacterController controller;
-    private PlayerStateManager manager;
 
     Transform cameraTransform;
     private Vector3 velocity;
@@ -28,6 +27,14 @@ public class Movement3D : MonoBehaviour
         cameraTransform = Camera.main.transform;
     }
 
+    private void Start()
+    {
+        PlayerStateManager.Instance.Input.actions["Move"].started += it => OnMove(it);
+        PlayerStateManager.Instance.Input.actions["Move"].performed += it => OnMove(it);
+        PlayerStateManager.Instance.Input.actions["Move"].canceled += it => OnMove(it);
+        PlayerStateManager.Instance.Input.actions["Jump"].started += it => OnJump(it);
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -36,7 +43,7 @@ public class Movement3D : MonoBehaviour
 
         handleStates();
 
-        if (!PlayerStateManager.Instance.isMovementBlocked)
+        if (!PlayerStateManager.Instance.IsMovementBlocked)
             commitMove();
     }
 
@@ -69,19 +76,19 @@ public class Movement3D : MonoBehaviour
 
     void handleStates()
     {
-        if (manager.GetCurrent() == States.Fishing || manager.GetCurrent() == States.Caught)
+        if (PlayerStateManager.Instance.CompareState(States.Fishing) || PlayerStateManager.Instance.CompareState(States.Caught))
             return;
 
         if (!controller.isGrounded)
         {
-            manager.ChangeState(States.Jumping);
+            PlayerStateManager.Instance.ChangeState(States.Jumping);
             return;
         }
             
         if (moveInput.magnitude > 0f)
-            manager.ChangeState(States.Walking);
+            PlayerStateManager.Instance.ChangeState(States.Walking);
         else
-            manager.ChangeState(States.Idle);
+            PlayerStateManager.Instance.ChangeState(States.Idle);
     }
 
     void rawInputToRelative()
@@ -110,12 +117,12 @@ public class Movement3D : MonoBehaviour
     }
 
     // INPUT EVENT HANDLING
-    void OnMove(InputValue value)
+    void OnMove(InputAction.CallbackContext ctx)
     {
-        moveInput = value.Get<Vector2>();
+        moveInput = ctx.ReadValue<Vector2>();
     }
 
-    void OnJump()
+    void OnJump(InputAction.CallbackContext ctx)
     {
         if (controller.isGrounded)
             isJumping = true;

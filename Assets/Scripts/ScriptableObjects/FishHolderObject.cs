@@ -10,7 +10,6 @@ public class FishHolderObject : ScriptableObject
     public FishObject GetRandomFish()
     {
         int i = Random.Range(0, Fishes.Length);
-        Debug.Log(i);
         return Fishes[i];
     }
 }
