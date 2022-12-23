@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Yarn.Unity;
 
 public class PlayerStateManager : MonoBehaviour
 {
@@ -12,9 +14,11 @@ public class PlayerStateManager : MonoBehaviour
     private Animator animator;
     private CharacterController controller;
     public PlayerInput Input { get; private set; }
+    public DialogueRunner DiagRunner;
 
     private States currentState;
     public bool IsMovementBlocked { get; private set; }
+    static private bool hasMissionAssigned;
 
     private void Awake()
     {
@@ -32,8 +36,12 @@ public class PlayerStateManager : MonoBehaviour
     void Start()
     {
         ChangeState(States.Idle);
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        hasMissionAssigned = false;
+
+        DiagRunner.onDialogueComplete.AddListener(() => ChangeState(States.Idle));
     }
 
     public void ChangeState(States state)
@@ -54,6 +62,9 @@ public class PlayerStateManager : MonoBehaviour
                 break;
             case States.Caught:
                 caughState();
+                break;
+            case States.Talking:
+                talkState();
                 break;
         }
 
@@ -103,6 +114,16 @@ public class PlayerStateManager : MonoBehaviour
         animator.SetTrigger("FishCaught");
         IsMovementBlocked = true;
     }
+
+    private void talkState()
+    {
+        IsMovementBlocked = true;
+    }
+
+    public GameObject GetPlayer()
+    {
+        return player;
+    }
 }
 
 public enum States
@@ -111,5 +132,6 @@ public enum States
     Walking,
     Jumping,
     Fishing,
-    Caught
+    Caught,
+    Talking
 }

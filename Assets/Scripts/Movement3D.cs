@@ -76,7 +76,7 @@ public class Movement3D : MonoBehaviour
 
     void handleStates()
     {
-        if (PlayerStateManager.Instance.CompareState(States.Fishing) || PlayerStateManager.Instance.CompareState(States.Caught))
+        if (PlayerStateManager.Instance.CompareState(States.Fishing) || PlayerStateManager.Instance.CompareState(States.Caught) || PlayerStateManager.Instance.CompareState(States.Talking))
             return;
 
         if (!controller.isGrounded)

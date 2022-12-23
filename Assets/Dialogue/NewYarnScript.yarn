@@ -1,7 +1,35 @@
-﻿title: Start
+﻿
+title: Start
 tags:
+position: 0,0
 ---
+<<declare $introDone = false as bool>>
+
+<<if !$introDone>>
+    <<jump Intro>>
+<<else>>
+    <<jump Mission>>
+<<endif>>
+
+
+===
+
+title: Intro
+position: 287,-81
+---
+<<set $introDone to true>>
 Panerola: Bienvenid@ a tu regalo del amigo invisible!
 Panerola: Espero que disfrutes de tu estancia.
 Panerola: Si necesitas cualquier cosa pega un grito.
+===
+
+title: Mission
+position: 316,100
+---
+<<if hasMission()>>
+    Panerola: Veo que estás ocupado, acaba la mision que tienes pendiente y ven a verme.
+<<else>>
+    Me podrías hacer un favorcito?
+    <<getMission NPCManager 0>>
+<<endif>>
 ===

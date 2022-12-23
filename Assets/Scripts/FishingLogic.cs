@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InteractionHandler : MonoBehaviour
+public class FishingLogic : MonoBehaviour
 {
     private SpringJoint joint;
     private WaterBodyLogic water;
@@ -39,10 +39,10 @@ public class InteractionHandler : MonoBehaviour
 
     private void Start()
     {
-        PlayerStateManager.Instance.Input.actions["Interact"].started += it => OnInteract(it);
+        PlayerStateManager.Instance.Input.actions["Fire"].started += it => OnFire(it);
     }
 
-    public void OnInteract(InputAction.CallbackContext ctx)
+    public void OnFire(InputAction.CallbackContext ctx)
     {
         Debug.Log(ctx.phase.ToString());
         if(reelPoint == null)
