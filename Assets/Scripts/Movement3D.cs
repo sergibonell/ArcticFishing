@@ -45,6 +45,7 @@ public class Movement3D : MonoBehaviour
 
         if (!PlayerStateManager.Instance.IsMovementBlocked)
             commitMove();
+
     }
 
     void handleMovementXZ()
@@ -128,5 +129,13 @@ public class Movement3D : MonoBehaviour
             isJumping = true;
         else
             StartCoroutine(bufferJump());
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.layer == LayerMask.NameToLayer("Fishable"))
+            PlayerStateManager.Instance.OnWater = true;
+        else
+            PlayerStateManager.Instance.OnWater = false;
     }
 }

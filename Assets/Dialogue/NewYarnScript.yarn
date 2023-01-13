@@ -4,11 +4,17 @@ tags:
 position: 0,0
 ---
 <<declare $introDone = false as bool>>
+<<declare $upset = false as bool>>
+<<declare $upsetIndex = 0 as number>>
+
+<<if $upset>>
+    <<jump UpsetBlock>>
+<<endif>>
 
 <<if !$introDone>>
     <<jump Intro>>
 <<else>>
-    <<jump Mission>>
+    <<jump MainTree>>
 <<endif>>
 
 
@@ -19,17 +25,62 @@ position: 287,-81
 ---
 <<set $introDone to true>>
 Panerola: Bienvenid@ a tu regalo del amigo invisible!
-Panerola: Espero que disfrutes de tu estancia.
-Panerola: Si necesitas cualquier cosa pega un grito.
+<<set_visible Bear false>>
+<<wait 2>>
+Panerola: ...
+Panerola: ¿Lo pillas? Amigo <i>invisible</i>.
+Panerola: Jaja.
+<<set_visible Bear true>>
+Panerola: Bueno, basta ya de bromas. Tengo malas noticias.
+Panerola: Cómo ya habrás podido observar, no me ha dado tiempo a terminar el juego.
+Panerola: Siento haberte arruinado las navidades.
+-> Player: No pasa nada, lo importante es la intención.
+    Panerola: Gracias por tu comprensión.
+-> Player: No te lo perdonaré jamás, Panerola. Jamás.
+    Panerola: Lo entiendo.
+    Panerola: ¡Pero fíjate en las físicas de la caña!
+-> Player: Vaya basura de "juego".
+    <<set $upset to true>>
+    Panerola: Lo siento.
+    <<stop>>
+Panerola: A ver, realmente el juego tiene las dos cosas que pediste.
+Panerola: Conversaciones y pesca.
+<<jump MainTree>>
 ===
 
-title: Mission
+title: MainTree
 position: 316,100
 ---
-<<if hasMission()>>
-    Panerola: Veo que estás ocupado, acaba la mision que tienes pendiente y ven a verme.
+-> Player: ¿Cómo funciona la pesca?
+    Panerola: Acércate a un cuerpo de agua y haz click izquierdo.
+    Panerola: ¿Sirve para algo?
+    Panerola: No. ¡Pero mira qué feliz está el pingüino!
+-> Player: ¿Cómo puedo entablar conversaciones?
+    Panerola: ...
+    Panerola: Creo que ya no hace falta que te lo diga, ¿no?
+-> Player: Bueno, me voy a pescar.
+    <<stop>>
+<<jump MainTree>>
+===
+
+title: UpsetBlock
+position: 316,100
+---
+<<if $upsetIndex == 0>>
+    Panerola: Lo siento mucho.
+<<elseif $upsetIndex == 1>>
+    Panerola: La he liado.
+<<elseif $upsetIndex == 2>>
+    Panerola: No volverá a pasar.
+<<elseif $upsetIndex == 3>>
+    Panerola: Por favor, no me hables. 
+<<elseif $upsetIndex == 4>>
+    Panerola: He dicho basta.
 <<else>>
-    Me podrías hacer un favorcito?
-    <<getMission NPCManager 0>>
+    Panerola: De acuerdo, no me has dejado alternativa.
+    <<close_game>>
 <<endif>>
+
+<<set $upsetIndex = $upsetIndex + 1>>
+<<stop>>
 ===

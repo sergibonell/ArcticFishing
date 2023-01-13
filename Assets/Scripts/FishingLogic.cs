@@ -8,6 +8,11 @@ public class FishingLogic : MonoBehaviour
     private WaterBodyLogic water;
 
     [SerializeField]
+    private AudioClip reel;
+    [SerializeField]
+    private AudioClip store;
+
+    [SerializeField]
     private Rigidbody hookRb;
     [SerializeField]
     private GameObject bobber;
@@ -56,6 +61,7 @@ public class FishingLogic : MonoBehaviour
             bobber.SetActive(true);
             fishMesh.mesh = null;
             PlayerStateManager.Instance.ChangeState(States.Idle);
+            PlayerStateManager.Instance.sound.playSound(store);
             return;
         }
 
@@ -80,7 +86,8 @@ public class FishingLogic : MonoBehaviour
 
     IEnumerator fishingWait()
     {
-        yield return new WaitForSecondsRealtime(2f);
+        float time = Random.Range(2f, 5f);
+        yield return new WaitForSecondsRealtime(time);
         PlayerStateManager.Instance.ChangeState(States.Caught);
         bobber.SetActive(false);
         fishMesh.mesh = water.AvailableFishes.GetRandomFish().Model;
@@ -91,6 +98,7 @@ public class FishingLogic : MonoBehaviour
     {
         hookRb.constraints = RigidbodyConstraints.None;
         StartCoroutine(reelCoroutine(distanceShort, reelUpTime));
+        PlayerStateManager.Instance.sound.playSound(reel);
     }
 
     IEnumerator reelCoroutine(float target, float time)
@@ -101,7 +109,7 @@ public class FishingLogic : MonoBehaviour
         while(currentTime < time)
         {
             currentTime += Time.deltaTime;
-            joint.maxDistance = Mathf.Lerp(startLen, target, currentTime);
+            joint.maxDistance = Mathf.Lerp(startLen, target, currentTime/time);
             yield return null;
         }
     }

@@ -6,6 +6,8 @@ public class IgnoreCollision : MonoBehaviour
 {
     [SerializeField]
     string[] layersToIgnore;
+    [SerializeField]
+    AudioClip splash;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +22,10 @@ public class IgnoreCollision : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Stuck") && PlayerStateManager.Instance.GetCurrent() == States.Fishing)
+        {
             GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ;
+            PlayerStateManager.Instance.sound.playSound(splash);
+        }
+            
     }
 }

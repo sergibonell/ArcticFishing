@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Yarn.Unity;
+using Cinemachine;
 
 public class PlayerStateManager : MonoBehaviour
 {
     public static PlayerStateManager Instance { get; private set; }
+    public bool OnWater = false;
 
     [SerializeField]
     private GameObject player;
@@ -15,6 +17,8 @@ public class PlayerStateManager : MonoBehaviour
     private CharacterController controller;
     public PlayerInput Input { get; private set; }
     public DialogueRunner DiagRunner;
+    public CinemachineInputProvider camInput;
+    public AmbientSoundManager sound;
 
     private States currentState;
     public bool IsMovementBlocked { get; private set; }
@@ -30,15 +34,14 @@ public class PlayerStateManager : MonoBehaviour
         animator = player.GetComponentInChildren<Animator>();
         controller = player.GetComponent<CharacterController>();
         Input = GetComponent<PlayerInput>();
+        sound = GetComponent<AmbientSoundManager>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
         ChangeState(States.Idle);
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
+        
         hasMissionAssigned = false;
 
         DiagRunner.onDialogueComplete.AddListener(() => ChangeState(States.Idle));
@@ -88,6 +91,7 @@ public class PlayerStateManager : MonoBehaviour
         if(currentState == States.Fishing || currentState == States.Caught) 
             animator.SetTrigger("ReturnIdle");
         IsMovementBlocked = false;
+        SetCamMovement(true);
     }
 
     void walkingState()
@@ -118,11 +122,25 @@ public class PlayerStateManager : MonoBehaviour
     private void talkState()
     {
         IsMovementBlocked = true;
+        SetCamMovement(false);
     }
 
     public GameObject GetPlayer()
     {
         return player;
+    }
+
+    public void SetCamMovement(bool x)
+    {
+        camInput.enabled = x;
+        Cursor.visible = !x;
+        Cursor.lockState = x ? CursorLockMode.Locked : CursorLockMode.Confined;
+    }
+
+    [YarnCommand("close_game")]
+    public static void CloseGame()
+    {
+        Application.Quit();
     }
 }
 
